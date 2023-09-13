@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.sample.applicaton.model.ParkingSlot;
@@ -28,7 +29,8 @@ public class CarParkingService {
 	private static int RATE_PER_HOUR = 2;
 	private List<ParkingSlot> slotsList = new ArrayList<ParkingSlot>();
 
-	
+	@Value("{parkingslots}")
+	private int parkinglots;
 	/**
 	 * This method intialized the prking slots with defaults values 
 	 * on application startup
@@ -40,7 +42,7 @@ public class CarParkingService {
 		}
 		//Syncronize lists as we are details with multiple cars a same point
 		slotsList = Collections.synchronizedList(slotsList);
-		logger.info("CarParkingService::init- Total parking slots intialized >> ",slotsList.size());
+		logger.info("CarParkingService::init- Total parking slots intialized >>{} ",slotsList.size());
 	}
 
 
@@ -117,9 +119,9 @@ public class CarParkingService {
 		
 						ParkingSlot.resetParkingSlot(slot);
 		
-						disAllocatedMessage = " Payment for vehicle " + vehicleId + " parked for " + parkedHours + " hours is £"
+						disAllocatedMessage = "Payment for vehicle " + vehicleId + " parked for " + parkedHours + " hours is £"
 								+ parkingBill;
-						logger.info("CarParkingService::disallocateParkingSlot- Slot sucesfullt dis allocated for vehicle",vehicleId);
+						logger.info("CarParkingService::disallocateParkingSlot- Slot sucesfully dis allocated for vehicle",vehicleId);
 		
 					} else {
 						disAllocatedMessage = "Vehicle " + vehicleId + " is not allocated with any parking slot.";
@@ -138,7 +140,7 @@ public class CarParkingService {
 	 * @param vehicleId
 	 * @return
 	 */
-	private Optional<ParkingSlot> fetchParkingSlotOfVehicle(String vehicleId) {
+	public Optional<ParkingSlot> fetchParkingSlotOfVehicle(String vehicleId) {
 		List<String> slot = slotsList.stream().map(s -> s.getVehicleId()).collect(Collectors.toList());
 		
 		if (slot.contains(vehicleId)) {
@@ -165,7 +167,7 @@ public class CarParkingService {
 	 * This method deals with checking for current available parking slots
 	 * @return
 	 */
-	private boolean checkForSlotAvailibility() {
+	public boolean checkForSlotAvailibility() {
 		long slot = slotsList.stream().filter(s -> s.isAvailable()).count();
 		logger.info("CarParkingService::checkForSlotAvailibility- slots available count >> {}",slot);
 		return slot > 0 ? true : false;
@@ -177,7 +179,7 @@ public class CarParkingService {
 	 * @param vehicleId
 	 * @return
 	 */
-	private boolean validateVehicleId(String vehicleId) {
+	public boolean validateVehicleId(String vehicleId) {
 		if (vehicleId != null && (vehicleId.length() > 0 && vehicleId.length() <= 7)) {
 			for (int i = 0; i < vehicleId.length(); i++) {
 				if (!Character.isLetter(vehicleId.charAt(i)) 
@@ -204,8 +206,8 @@ public class CarParkingService {
 			long totalSlotsOccupied = slotsList.stream().filter(s->!s.isAvailable()).count();
 			long totalSlotsAvailable = slotsList.stream().filter(s->s.isAvailable()).count();
 			
-			message.append(" Total Available Slots :: "+totalSlotsAvailable);
-			message.append("\n Total Occupied Slots  :: "+totalSlotsOccupied);
+			message.append("Total Available Slots :: "+totalSlotsAvailable);
+			message.append("\nTotal Occupied Slots  :: "+totalSlotsOccupied);
 			logger.info("CarParkingService::getParkingSlotsStatus- Status >> {}",message.toString());
 			return message.toString();
 		}catch (Exception e) {
