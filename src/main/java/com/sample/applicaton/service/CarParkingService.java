@@ -29,8 +29,6 @@ public class CarParkingService {
 	private static int RATE_PER_HOUR = 2;
 	private List<ParkingSlot> slotsList = new ArrayList<ParkingSlot>();
 
-	@Value("{parkingslots}")
-	private int parkinglots;
 	/**
 	 * This method intialized the prking slots with defaults values 
 	 * on application startup
